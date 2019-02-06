@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <ctime>
+#include <sstream>
 #include <boost/asio.hpp>
 
 enum exec {
@@ -10,5 +11,4 @@ enum exec {
     FAIL
 };
 
-exec parse_query(const char* buf, size_t len, std::vector<std::string>& query);
-exec process(std::vector<std::string>& query);
+exec parseQuery(const char* buf, size_t len, std::vector<std::string>& query);

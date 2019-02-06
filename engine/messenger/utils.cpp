@@ -1,6 +1,6 @@
 #include "utils.h"
 
-exec parse_query(const char* buf, size_t len, std::vector<std::string>& query) {
+exec parseQuery(const char* buf, size_t len, std::vector<std::string>& query) {
     try {
         std::stringstream ss;
         ss << buf;
@@ -17,12 +17,8 @@ exec parse_query(const char* buf, size_t len, std::vector<std::string>& query) {
     }
     catch (std::exception const& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Unable to parse" << std::endl;
     }
     return FAIL;
 }
 
-exec process(std::vector<std::string>& query) {
-    std::cerr << query[0] << std::endl;
-    return SUCCESS;
-}
