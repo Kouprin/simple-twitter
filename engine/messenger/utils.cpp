@@ -3,7 +3,13 @@
 exec parseQuery(const char* buf, size_t len, std::vector<std::string>& query) {
     try {
         std::stringstream ss;
-        ss << buf;
+        char copy[4097];
+        strcpy(copy, buf);
+        while (strlen(copy) && isspace(copy[strlen(copy) - 1])) {
+            // TODO telnet quick fix
+            copy[strlen(copy) - 1] = copy[strlen(copy)];
+        }
+        ss << copy;
         query.clear();
         std::string token;
         while (std::getline(ss, token, '\t')) {
