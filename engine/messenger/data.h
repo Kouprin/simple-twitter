@@ -32,6 +32,7 @@ class User {
 
     public:
         User(int id, std::string& name, std::string& email) {
+            this->id = id;
             this->name = name;
             this->email = email;
         }
@@ -63,13 +64,14 @@ class Channel {
 
     public:
         Channel(int id, std::string& name) {
+            this->id = id;
             this->name = name;
             generateLink();
         }
         int getId() {
             return id;
         }
-        auto getMessagesSize() {
+        int getMessagesSize() {
             return messages.size();
         }
         std::vector<Message> getMessages() {
@@ -114,10 +116,10 @@ class Messenger {
         Channel* getChannelPtr(int index) {
             return channels[index];
         }
-        auto getChannelsSize() {
+        int getChannelsSize() {
             return channels.size();
         }
-        auto getUsersSize() {
+        int getUsersSize() {
             return users.size();
         }
 };

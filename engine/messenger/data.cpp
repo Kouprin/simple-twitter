@@ -52,7 +52,7 @@ exec processQuery(Messenger* messenger, std::vector<std::string>& query, std::ve
         if (query.size() != 2)
             return FAIL;
         Channel* channel_ptr = nullptr;
-        for (auto i = 0; i < messenger->getChannelsSize(); ++i) {
+        for (int i = 0; i < messenger->getChannelsSize(); ++i) {
             if (messenger->getChannelPtr(i)->getLink() == query[1]) {
                 channel_ptr = messenger->getChannelPtr(i);
                 break;
@@ -75,7 +75,7 @@ exec processQuery(Messenger* messenger, std::vector<std::string>& query, std::ve
         Channel* channel_ptr = messenger->getChannelPtr(channel_id);
         std::vector<Message> messages = channel_ptr->getMessages();
         answer.push_back(std::to_string(messages.size()));
-        for (auto i = 0; i < messages.size(); ++i) {
+        for (int i = 0; i < messages.size(); ++i) {
             answer.push_back(messages[i].getUserPtr()->getName());
             answer.push_back(messages[i].getText());
         }
