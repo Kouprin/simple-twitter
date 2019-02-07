@@ -1,7 +1,10 @@
 <!doctype html>
 <body>
+    {% if current_user.is_authenticated %}
+    <h1>Hi {{ current_user.name }}!</h1>
+    {% endif %}
     <h1>{{ head }}</h1>
     {% for item in data %}
-        <h1>{{ item }}</h1>
+        <h3>{{ item }}</h3>
     {% endfor %}
 </body>

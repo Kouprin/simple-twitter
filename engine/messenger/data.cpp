@@ -44,7 +44,7 @@ exec process_query(Messenger* messenger, std::vector<std::string>& query, std::v
         if (!user_ptr)
             return FAIL;
         answer.push_back(std::to_string(user_ptr->getId()));
-        answer.push_back(user_ptr->getEmail());
+        answer.push_back(user_ptr->getName());
         return SUCCESS;
     }
     if (query[0] == "loginUser") {
