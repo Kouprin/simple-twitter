@@ -1,12 +1,39 @@
 version: "3"
 
 services:
-    # messages-engine
-    messages-engine:
+    messenger:
         image: kouprin/messenger:latest
-        container_name: messages
+        container_name: messenger
         build:
             context: ./engine
             dockerfile: Dockerfile
         volumes:
             - ./data:/data
+        ports:
+            - 8888:8888
+        networks:
+            - backend
+
+    app:
+        image: kouprin/app:latest
+        container_name: app
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        ports:
+            - 5000:5000
+        links:
+            - messenger
+        networks:
+            - backend
+#
+#    nginx:
+#        image: nginx:latest
+#        container_name: nginx
+#        volumes:
+#            - ./html:/usr/share/nginx/html
+#        ports:
+#            - 8080:80
+networks:
+    backend:
+        driver: "bridge"

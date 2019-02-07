@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
             boost::system::error_code error;
 
             size_t len = socket.read_some(boost::asio::buffer(buf), error);
+            // std::cerr << "GOT: " << buf << std::endl;
             while (strlen(buf) && isspace(buf[strlen(buf) - 1])) {
                 // TODO telnet quick fix - kill trailing whitespaces
                 buf[strlen(buf) - 1] = buf[strlen(buf)];
@@ -53,18 +54,18 @@ int main(int argc, char* argv[])
             std::vector<std::string> answer;
             std::vector<std::string> query;
             if (parse_query(buf, len, query) == SUCCESS) {
-                assert(write_query(buf, len, data_file) == SUCCESS);
                 exec result = process_query(messenger, query, answer);
                 if (result == SUCCESS) {
+                    assert(write_query(buf, len, data_file) == SUCCESS);
                     std::cerr << "OK: " << buf << std::endl;
-                    socket.write_some(boost::asio::buffer("OK"));
+                    std::string send_line = "OK";
                     for (auto i = 0; i < answer.size(); ++i) {
-                        socket.write_some(boost::asio::buffer("\t"));
-                        socket.write_some(boost::asio::buffer(answer[i]));
+                        send_line += "\t" + answer[i];
                     }
+                    socket.write_some(boost::asio::buffer(send_line));
                 } else {
                     std::cerr << "NO: " << buf << std::endl;
-                    socket.write_some(boost::asio::buffer("FAILED"));
+                    socket.write_some(boost::asio::buffer("NO"));
                 }
             } else {
                 std::string print_error;
@@ -97,7 +98,7 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-        std::cerr << "Ugh, something wrong" << std::endl;
+        std::cerr << "Ugh, something wrong: " << e.what() << std::endl;
     }
     return 0;
 }

@@ -54,20 +54,20 @@ class Channel {
         std::string name;
         std::string link;
         std::vector<Message> messages;
-        void generateLink() {
+        /*void generateLink() {
             assert(!name.empty());
             for (int i = 0; i < 6; ++i) {
                 int random_number = std::experimental::randint(0, 25);
                 char letter = 'a' + random_number;
                 link = link + letter;
             }
-        }
+        }*/
 
     public:
-        Channel(int id, std::string& name) {
+        Channel(int id, std::string& name, std::string& link) {
             this->id = id;
             this->name = name;
-            generateLink();
+            this->link = link;
         }
         int getId() {
             return id;
@@ -79,7 +79,6 @@ class Channel {
             return messages;
         }
         std::string getLink() {
-            assert(!link.empty());
             return link;
         }
         std::string getName() {
@@ -99,9 +98,9 @@ class Messenger {
 
     public:
         Messenger() {}
-        exec addChannel(std::string& channelName) {
+        exec addChannel(std::string& channelName, std::string& link) {
             int id = channels.size();
-            Channel* channel = new Channel(id, channelName);
+            Channel* channel = new Channel(id, channelName, link);
             channels.push_back(channel);
             return SUCCESS;
         }

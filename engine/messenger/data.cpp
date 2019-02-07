@@ -10,15 +10,10 @@ exec process_query(Messenger* messenger, std::vector<std::string>& query, std::v
         return messenger->addUser(query[1], query[2]);
     }
     if (query[0] == "addChannel") {
-        // q: addChannel name
-        // a: link
-        if (query.size() != 2)
+        // q: addChannel name link
+        if (query.size() != 3)
             return FAIL;
-        if (messenger->addChannel(query[1]) == SUCCESS) {
-            answer.push_back(messenger->getChannelPtr(messenger->getChannelsSize() - 1)->getLink());
-            return SUCCESS;
-        }
-        return FAIL;
+        return messenger->addChannel(query[1], query[2]);
     }
     if (query[0] == "addMessage") {
         // q: addMessage channelId userId message
