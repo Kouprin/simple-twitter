@@ -20,12 +20,12 @@ def engine_query(query, data):
     server_address = ('messenger', 8888)
     sock.connect(server_address)
     send_it = query + '\t' + '\t'.join(data)
-    eprint(send_it.encode('ASCII'))
-    sock.sendall(send_it.encode('ASCII'))
+    eprint(send_it.encode('UTF-8'))
+    sock.sendall(send_it.encode('UTF-8'))
     reply = sock.recv(4096)
     sock.close()
     eprint(reply)
-    reply = reply.decode('ASCII')
+    reply = reply.decode('UTF-8')
     eprint('getting ' + reply)
     if not reply or reply == "NO":
         return None
@@ -106,7 +106,7 @@ def channel():
         messages = engine_query('getMessages', [channel[0]])
         return render_template('channel.html', form=form, head=channel[1], link=link, data=messages)
     elif request.method == 'POST':
-        engine_query('addMessage', ['0', current_user.id, form.text.data])
+        engine_query('addMessage', [channel[0], current_user.id, form.text.data])
         messages = engine_query('getMessages', [channel[0]])
         return render_template('channel.html', form=form, head=channel[1], link=link, data=messages)
 
