@@ -1,6 +1,6 @@
 #include "data.h"
 
-exec processQuery(Messenger* messenger, std::vector<std::string>& query, std::vector<std::string>& answer) {
+exec process_query(Messenger* messenger, std::vector<std::string>& query, std::vector<std::string>& answer) {
     std::cerr << query[0] << std::endl;
     answer.clear();
     if (query[0] == "addUser") {
@@ -82,4 +82,24 @@ exec processQuery(Messenger* messenger, std::vector<std::string>& query, std::ve
         return SUCCESS;
     }
     return FAIL;
+}
+
+exec write_query(const char* buf, size_t len, std::string filename) {
+    std::fstream fs;
+    fs.open(filename, std::fstream::out | std::fstream::app);
+    fs << buf << std::endl; // TODO len
+    fs.close();
+    return SUCCESS;
+}
+
+exec read_queries(Messenger* messenger, std::string filename) {
+    std::fstream fs;
+    fs.open(filename, std::fstream::in);
+    for (std::string line; std::getline(fs, line); ) {
+        std::vector<std::string> query, answer;
+        parse_query(line.c_str(), line.size(), query);
+        process_query(messenger, query, answer);
+    }
+    fs.close();
+    return SUCCESS;
 }

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <experimental/random>
+#include <fstream>
 #include "utils.h"
 
 class User;
@@ -124,4 +125,6 @@ class Messenger {
         }
 };
 
-exec processQuery(Messenger* messenger, std::vector<std::string>& query, std::vector<std::string>& answer);
+exec read_queries(Messenger* messenger, std::string filename);
+exec write_query(const char* buf, size_t len, std::string filename);
+exec process_query(Messenger* messenger, std::vector<std::string>& query, std::vector<std::string>& answer);

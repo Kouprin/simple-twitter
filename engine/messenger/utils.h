@@ -11,4 +11,4 @@ enum exec {
     FAIL
 };
 
-exec parseQuery(const char* buf, size_t len, std::vector<std::string>& query);
+exec parse_query(const char* buf, size_t len, std::vector<std::string>& query);

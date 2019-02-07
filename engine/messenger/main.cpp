@@ -5,11 +5,13 @@ using boost::asio::ip::tcp;
 
 #define MAX_BUF_SIZE 4096
 #define ERR_MSG "ERROR: cannot parse query "
+#define DEFAULT_DATA_FILE "/data/queries.data"
 
 Messenger* messenger;
 
 int main(int argc, char* argv[])
 {
+    std::string data_file = DEFAULT_DATA_FILE;
     try {
         // TODO: move client-server part to network.h
         // TODO: opt-args, choose port
@@ -21,8 +23,12 @@ int main(int argc, char* argv[])
 
         // TODO load from somewhere
         messenger = new Messenger();
+        if (read_queries(messenger, data_file) != SUCCESS) {
+            std::cerr << "Can't load queries" << std::endl;
+            exit(123);
+        }
 
-        std::cerr << "Server started, port 8888." << std::endl;
+        std::cerr << "Server started, port 8888" << std::endl;
 
         for (;;) {
             tcp::socket socket(io_service);
@@ -33,6 +39,10 @@ int main(int argc, char* argv[])
             boost::system::error_code error;
 
             size_t len = socket.read_some(boost::asio::buffer(buf), error);
+            while (strlen(buf) && isspace(buf[strlen(buf) - 1])) {
+                // TODO telnet quick fix - kill trailing whitespaces
+                buf[strlen(buf) - 1] = buf[strlen(buf)];
+            }
 
             if (error == boost::asio::error::eof) {
                 break; // Connection closed cleanly by peer.
@@ -42,8 +52,9 @@ int main(int argc, char* argv[])
 
             std::vector<std::string> answer;
             std::vector<std::string> query;
-            if (parseQuery(buf, len, query) == SUCCESS) {
-                exec result = processQuery(messenger, query, answer);
+            if (parse_query(buf, len, query) == SUCCESS) {
+                assert(write_query(buf, len, data_file) == SUCCESS);
+                exec result = process_query(messenger, query, answer);
                 if (result == SUCCESS) {
                     std::cerr << "OK: " << buf << std::endl;
                     socket.write_some(boost::asio::buffer("OK"));
@@ -61,24 +72,26 @@ int main(int argc, char* argv[])
                 print_error += buf;
                 std::cerr << print_error << std::endl;
             }
-            std::cerr << "DEBUG" << std::endl;
-            std::cerr << "Users=" << messenger->getUsersSize() << std::endl;
-            for (auto i = 0; i < messenger->getUsersSize(); ++i) {
-                User* u = messenger->getUserPtr(i);
-                std::cerr << "User " << i << ": id=" << u->getId() << " name=" << u->getName() << " email=" << u->getEmail() << std::endl;
-            }
-            std::cerr << "Channels=" << messenger->getChannelsSize() << std::endl;
-            for (auto i = 0; i < messenger->getChannelsSize(); ++i) {
-                Channel* c = messenger->getChannelPtr(i);
-                std::cerr << "Channel " << i << ": id=" << c->getId() << " name=" << c->getName() << " link=" << c->getLink() << " messages size=" << c->getMessagesSize() << std::endl;
-                if (c->getMessagesSize()) {
-                    std::vector<Message> messages = c->getMessages();
-                    for (auto j = 0; j < messages.size(); ++j) {
-                        std::cerr << " Message " << j << " user=" << messages[j].getUserPtr()->getName() << " msg=" << messages[j].getText() << std::endl;
+            if (true) {
+                std::cerr << "DEBUG" << std::endl;
+                std::cerr << "Users=" << messenger->getUsersSize() << std::endl;
+                for (auto i = 0; i < messenger->getUsersSize(); ++i) {
+                    User* u = messenger->getUserPtr(i);
+                    std::cerr << "User " << i << ": id=" << u->getId() << " name=" << u->getName() << " email=" << u->getEmail() << std::endl;
+                }
+                std::cerr << "Channels=" << messenger->getChannelsSize() << std::endl;
+                for (auto i = 0; i < messenger->getChannelsSize(); ++i) {
+                    Channel* c = messenger->getChannelPtr(i);
+                    std::cerr << "Channel " << i << ": id=" << c->getId() << " name=" << c->getName() << " link=" << c->getLink() << " messages size=" << c->getMessagesSize() << std::endl;
+                    if (c->getMessagesSize()) {
+                        std::vector<Message> messages = c->getMessages();
+                        for (auto j = 0; j < messages.size(); ++j) {
+                            std::cerr << " Message " << j << " user=" << messages[j].getUserPtr()->getName() << " msg=" << messages[j].getText() << std::endl;
+                        }
                     }
                 }
+                std::cerr << "===" << std::endl;
             }
-            std::cerr << "===" << std::endl;
             
         }
     }

@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+    # messages-engine
+    messages-engine:
+        image: kouprin/messenger:latest
+        container_name: messages
+        build:
+            context: ./engine
+            dockerfile: Dockerfile
+        volumes:
+            - ./data:/data
