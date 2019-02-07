@@ -1,10 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Channel</title>
+</head>
 <body>
     {% if current_user.is_authenticated %}
-    <h1>Hi {{ current_user.name }}!</h1>
+        <h1>Hi {{ current_user.name }}!</h1>
     {% endif %}
     <h1>{{ head }}</h1>
     {% for item in data %}
         <h3>{{ item }}</h3>
     {% endfor %}
+
+    {% if current_user.is_authenticated %}
+        <form method="POST" action="/channel?link={{ link }}">
+            {{ form.hidden_tag() }}
+            {{ form.text.label }} {{ form.text }}
+            <input type="submit" value="Send message">
+        </form>
+    {% endif %}
 </body>
+</html>

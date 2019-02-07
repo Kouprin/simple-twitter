@@ -1,7 +1,7 @@
 from __future__ import print_function
 from flask import Flask, request, render_template, session, redirect, url_for
-from flask_login import LoginManager, login_user, login_required, logout_user
-from forms import SignupForm, LoginForm
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from forms import SignupForm, LoginForm, SendMessageForm
 from user import User
 import socket
 import requests
@@ -38,7 +38,7 @@ def load_user(email):
     user = engine_query('getUser', [email])
     if not user:
         return None
-    return User(name=user[1], email=email)
+    return User(id=user[0], name=user[1], email=email)
 
 @app.route('/protected')
 @login_required
@@ -93,17 +93,23 @@ def logout():
 def hello_world():
     return 'Hello, World!'
 
-@app.route('/channel')
-def link_parse():
+@app.route('/channel', methods=['GET','POST'])
+def channel():
+    form = SendMessageForm()
     link = request.args.get('link')
     channel = engine_query('getChannelByLink', [link])
     if not channel:
         return render_template('channel.html', head='No such channel', data='')
-    
-    eprint(channel[0])
-    eprint(channel[0].encode('ASCII'))
-    messages = engine_query('getMessages', [channel[0]])
-    return render_template('channel.html', head=channel[1], data=messages)
+    if request.method == 'GET':
+        #eprint(channel[0])
+        #eprint(channel[0].encode('ASCII'))
+        messages = engine_query('getMessages', [channel[0]])
+        return render_template('channel.html', form=form, head=channel[1], link=link, data=messages)
+    elif request.method == 'POST':
+        engine_query('addMessage', ['0', current_user.id, form.text.data])
+        messages = engine_query('getMessages', [channel[0]])
+        return render_template('channel.html', form=form, head=channel[1], link=link, data=messages)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
