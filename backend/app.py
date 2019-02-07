@@ -1,5 +1,8 @@
 from __future__ import print_function
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session, redirect, url_for
+from flask_login import LoginManager, login_user, login_required, logout_user
+from forms import SignupForm, LoginForm
+from user import User
 import socket
 import requests
 import sys
@@ -8,6 +11,9 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 app = Flask(__name__)
+app.secret_key = b'(YG&RW9ywgrfwi6gf86srGEFWI^sfuydafgisdfig123'
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 def engine_query(query, data):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,7 +29,65 @@ def engine_query(query, data):
     eprint('getting ' + reply)
     if not reply or reply == "NO":
         return None
+    if reply == "OK":
+        return True
     return reply.split('\t')[1:]
+
+@login_manager.user_loader
+def load_user(email):
+    user = engine_query('getUser', [email])
+    if not user:
+        return None
+    return User(name=user[1], email=email)
+
+@app.route('/protected')
+@login_required
+def protected():
+    return "protected area"
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+    if request.method == 'GET':
+        return render_template('signup.html', form=form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            if load_user(form.email.data):
+                return "Email address already exists" # TODO popup?
+            else:
+                if engine_query('addUser', [form.name.data, form.email.data, form.password.data]):
+                    user = load_user(form.email.data)
+                    login_user(user)
+                    return "User created"
+                else:
+                    return "Server failed"
+        else:
+            return "Form didn't validate" # TODO popup?
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    form = LoginForm()
+    if request.method == 'GET':
+        return render_template('login.html', form=form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            user = load_user(form.email.data)
+            if user:
+                if engine_query('loginUser', [form.email.data, form.password.data]):
+                    login_user(user)
+                    return "User logged in"                
+                else:
+                    return "Wrong password"            
+            else:
+                return "User doesn't exist"        
+        else:
+            return "Form didn't validate" # TODO popup?
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return "Logged out"
 
 @app.route('/')
 def hello_world():

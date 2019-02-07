@@ -4,10 +4,10 @@ exec process_query(Messenger* messenger, std::vector<std::string>& query, std::v
     std::cerr << query[0] << std::endl;
     answer.clear();
     if (query[0] == "addUser") {
-        // q: addUser name email
-        if (query.size() != 3)
+        // q: addUser name email password
+        if (query.size() != 4)
             return FAIL;
-        return messenger->addUser(query[1], query[2]);
+        return messenger->addUser(query[1], query[2], query[3]);
     }
     if (query[0] == "addChannel") {
         // q: addChannel name link
@@ -29,17 +29,38 @@ exec process_query(Messenger* messenger, std::vector<std::string>& query, std::v
         return (messenger->getChannelPtr(channel_id))->addMessage(message);
     }
     if (query[0] == "getUser") {
-        // q: getUser userId
-        // a: name email
+        // q: getUser email
+        // a: userId name
         if (query.size() != 2)
             return FAIL;
-        std::stringstream user_stream(query[1]);
-        int user_id;
-        user_stream >> user_id;
-        User* user_ptr = messenger->getUserPtr(user_id);
-        answer.push_back(user_ptr->getName());
+        User* user_ptr = nullptr;
+        for (int i = 0; i < messenger->getUsersSize(); ++i) {
+            if (messenger->getUserPtr(i)->getEmail() == query[1]) {
+                // TODO build map<email, User*> instead
+                user_ptr = messenger->getUserPtr(i);
+                break;
+            }
+        }
+        if (!user_ptr)
+            return FAIL;
+        answer.push_back(std::to_string(user_ptr->getId()));
         answer.push_back(user_ptr->getEmail());
         return SUCCESS;
+    }
+    if (query[0] == "loginUser") {
+        // q: loginUser email password
+        if (query.size() != 3)
+            return FAIL;
+        User* user_ptr = nullptr;
+        for (int i = 0; i < messenger->getUsersSize(); ++i) {
+            if (messenger->getUserPtr(i)->getEmail() == query[1]) {
+                user_ptr = messenger->getUserPtr(i);
+                break;
+            }
+        }
+        if (!user_ptr)
+            return FAIL;
+        return user_ptr->checkPassword(query[2]);
     }
     if (query[0] == "getChannelByLink") {
         // q: getChannelByLink channelLink
@@ -49,6 +70,7 @@ exec process_query(Messenger* messenger, std::vector<std::string>& query, std::v
         Channel* channel_ptr = nullptr;
         for (int i = 0; i < messenger->getChannelsSize(); ++i) {
             if (messenger->getChannelPtr(i)->getLink() == query[1]) {
+                // TODO build map<link, Channel*> instead
                 channel_ptr = messenger->getChannelPtr(i);
                 break;
             }

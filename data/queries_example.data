@@ -1,5 +1,5 @@
-addUser	Alex Kouprin	kouprinal@gmail.com
-addUser	Krya Anna	kry@k
+addUser	Alex Kouprin	kouprinal@gmail.com	12345
+addUser	Krya Anna	kry@k.ka	qwerty
 addChannel	Dlya Nas	testlink
 addMessage	0	0	Privet! Ya tebya lublu!
 addMessage	0	1	Privet! Ya tebya tozhe!

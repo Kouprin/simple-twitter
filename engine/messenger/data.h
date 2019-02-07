@@ -30,12 +30,14 @@ class User {
         int id;
         std::string name;
         std::string email;
+        std::string password;
 
     public:
-        User(int id, std::string& name, std::string& email) {
+        User(int id, std::string& name, std::string& email, std::string& password) {
             this->id = id;
             this->name = name;
             this->email = email;
+            this->password = password;
         }
         int getId() {
             return id;
@@ -45,6 +47,9 @@ class User {
         }
         std::string getEmail() {
             return email;
+        }
+        exec checkPassword(std::string& password) {
+            return this->password == password ? SUCCESS : FAIL;
         }
 };
 
@@ -104,9 +109,9 @@ class Messenger {
             channels.push_back(channel);
             return SUCCESS;
         }
-        exec addUser(std::string& name, std::string& email) {
+        exec addUser(std::string& name, std::string& email, std::string& password) {
             int id = users.size();
-            User* user = new User(id, name, email);
+            User* user = new User(id, name, email, password);
             users.push_back(user);
             return SUCCESS;
         }
