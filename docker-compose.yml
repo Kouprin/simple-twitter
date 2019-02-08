@@ -13,6 +13,7 @@ services:
             - 8888:8888
         networks:
             - backend
+        restart: always
 
     app:
         image: kouprin/app:latest
@@ -26,6 +27,7 @@ services:
             - messenger
         networks:
             - backend
+        restart: always
 #
 #    nginx:
 #        image: nginx:latest
