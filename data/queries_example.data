@@ -3,3 +3,8 @@ addUser	Krya Anna	kry@k.ka	qwerty
 addChannel	Dlya Nas	testlink
 addMessage	0	0	Privet! Ya tebya lublu!
 addMessage	0	1	Privet! Ya tebya tozhe!
+addChannel	Test channel one	one
+addChannel	Test channel two	two
+addMessage	1	0	Hi!
+addMessage	1	1	This is test channel one
+addMessage	2	0	This is test channel two

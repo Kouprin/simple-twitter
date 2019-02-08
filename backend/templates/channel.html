@@ -7,7 +7,20 @@
 <body>
     {% if current_user.is_authenticated %}
         <h1>Hi {{ current_user.name }}!</h1>
+        <form method="GET" action="/logout">
+            <input type="submit" value="Logout">
+        </form>
+    {% else %}
+        <form method="GET" action="/signup">
+            <p>Not a member?</p>
+            <input type="submit" value="Sign up">
+        </form>
+        <form method="GET" action="/login">
+            <p>Already a member?</p>
+            <input type="submit" value="Login">
+        </form>
     {% endif %}
+
     <h1>{{ head }}</h1>
     {% for item in data %}
         <h3>{{ item }}</h3>

@@ -1,5 +1,5 @@
 from __future__ import print_function
-from flask import Flask, request, render_template, session, redirect, url_for
+from flask import Flask, request, render_template, session, redirect, url_for, Response
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms import SignupForm, LoginForm, SendMessageForm
 from user import User
@@ -87,7 +87,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return "Logged out"
+    return Response("Logged out")
 
 @app.route('/')
 def hello_world():
